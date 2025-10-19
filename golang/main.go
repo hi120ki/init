@@ -1,5 +1,6 @@
 package main
 
+// Test comment for GitHub Actions workflow
 import (
 	"log/slog"
 	"os"
