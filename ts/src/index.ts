@@ -1,45 +1,37 @@
-import pino from "pino";
+import pino, { type Logger } from "pino";
 import * as dotenv from "dotenv";
 import { z } from "zod";
 
-type Config = {
-  apiKey: string;
-};
+enum Environment {
+  Development = "development",
+  Production = "production",
+}
 
 const EnvSchema = z.object({
   API_KEY: z.string().min(1, "API_KEY is required"),
+  ENVIRONMENT: z.enum(Environment).default(Environment.Development),
 });
 
-function createLogger() {
-  const environment = process.env.ENVIRONMENT;
-  const logLevel = environment === "production" ? "info" : "debug";
+type Config = {
+  apiKey: string;
+  environment: Environment;
+};
 
+const createLogger = (environment: Environment): Logger => {
+  const level = environment === Environment.Production ? "info" : "debug";
   return pino({
-    level: logLevel,
+    level,
     base: { name: "app" },
     timestamp: pino.stdTimeFunctions.isoTime,
   });
-}
+};
 
-function loadEnv(logger: pino.Logger) {
-  const envResult = dotenv.config({ quiet: true });
-  if (envResult.error) {
-    logger.warn(
-      { error: envResult.error.message },
-      "Failed to load .env file, using system environment variables",
-    );
-  } else {
-    logger.info("Loaded .env file");
-  }
-}
-
-function validateEnv(logger: pino.Logger): Config {
+const parseConfig = (logger: Logger): Config => {
   const parsed = EnvSchema.safeParse(process.env);
-
   if (!parsed.success) {
-    const issues = parsed.error.issues.map((i) => ({
-      path: i.path.join("."),
-      message: i.message,
+    const issues = parsed.error.issues.map((issue) => ({
+      path: issue.path.join(".") || "<root>",
+      message: issue.message,
     }));
     logger.error(
       { error: { issues } },
@@ -47,18 +39,25 @@ function validateEnv(logger: pino.Logger): Config {
     );
     process.exit(1);
   }
-
   return {
     apiKey: parsed.data.API_KEY,
+    environment: parsed.data.ENVIRONMENT,
   };
-}
+};
 
-function main() {
-  const logger = createLogger();
-  loadEnv(logger);
-  const config = validateEnv(logger);
+const main = (): void => {
+  dotenv.config({ quiet: true });
 
-  logger.info({ api_key: config.apiKey }, "Application started");
-}
+  const initialEnvironment = Environment.Development;
+  const logger = createLogger(initialEnvironment);
+
+  const config = parseConfig(logger);
+  logger.level = config.environment === Environment.Production ? "info" : "debug";
+
+  logger.info(
+    { api_key: config.apiKey, environment: config.environment },
+    "Application started",
+  );
+};
 
 main();
