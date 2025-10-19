@@ -6,3 +6,15 @@ help: ## Print this help message
 .PHONY: hello
 hello: ## Print "Hello, World!"
 	echo "Hello, World!"
+
+.PHONY: run-go
+run-go: ## Run the Go service
+	cd golang && go run .
+
+.PHONY: run-python
+run-python: ## Run the Python service
+	cd python && uv sync && uv run python main.py
+
+.PHONY: run-ts
+run-ts: ## Run the TypeScript service
+	cd ts && npm install && npm run dev
