@@ -48,9 +48,12 @@ const parseConfig = (logger: Logger): Config => {
 const main = (): void => {
   dotenv.config({ quiet: true });
   const initialEnvironment = Environment.Development;
-  const logger = createLogger(initialEnvironment);
-  const config = parseConfig(logger);
-  logger.level = config.environment === Environment.Production ? "info" : "debug";
+  const bootstrapLogger = createLogger(initialEnvironment);
+  const config = parseConfig(bootstrapLogger);
+  const logger =
+    config.environment === initialEnvironment
+      ? bootstrapLogger
+      : createLogger(config.environment);
 
   logger.info(
     { api_key: config.apiKey, environment: config.environment },
