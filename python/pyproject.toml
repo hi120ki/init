@@ -1,0 +1,12 @@
+[project]
+name = "init"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "python-dotenv>=1.1.1",
+    "structlog>=25.4.0",
+]
