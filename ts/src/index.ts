@@ -1,3 +1,4 @@
+// Test comment for GitHub Actions workflow
 import pino from "pino";
 import * as dotenv from "dotenv";
 import { z } from "zod";
