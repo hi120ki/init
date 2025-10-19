@@ -9,7 +9,8 @@ import (
 )
 
 type Config struct {
-	APIKey string `envconfig:"API_KEY" required:"true"`
+	APIKey      string `envconfig:"API_KEY" required:"true"`
+	Environment string `envconfig:"ENVIRONMENT" default:"development"`
 }
 
 func main() {
@@ -24,11 +25,7 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-	if err := godotenv.Load(); err != nil {
-		slog.Warn("Failed to load .env file, using system environment variables", "error", err)
-	} else {
-		slog.Info("Loaded .env file")
-	}
+	_ = godotenv.Load()
 
 	var config Config
 	if err := envconfig.Process("", &config); err != nil {
@@ -36,5 +33,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("Application started", "api_key", config.APIKey)
+	slog.Info("Application started", "api_key", config.APIKey, "environment", config.Environment)
 }
