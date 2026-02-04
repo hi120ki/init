@@ -15,11 +15,11 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "pino": "^10.1.0",
-    "zod": "^4.1.12"
+    "pino": "^10.3.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^24.8.1",
+    "@types/node": "^25.2.0",
     "typescript": "^5.9.3"
   }
 }
