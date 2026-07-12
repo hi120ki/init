@@ -21,8 +21,8 @@ def new_logger(environment: Environment) -> structlog.typing.FilteringBoundLogge
             structlog.processors.dict_tracebacks,
             structlog.processors.JSONRenderer(),
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(level),
-        logger_factory=structlog.PrintLoggerFactory(sys.stdout),
+        wrapper_class=structlog.make_filtering_bound_logger(min_level=level),
+        logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
         cache_logger_on_first_use=True,
     )
 

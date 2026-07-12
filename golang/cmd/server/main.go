@@ -14,5 +14,5 @@ func main() {
 	}
 	logger := logger.NewLogger(cfg.Environment)
 
-	logger.Info("application started", "environment", cfg.Environment, "port", cfg.Port)
+	logger.Info("application started", "port", cfg.Port)
 }

@@ -1,5 +1,7 @@
 """Application entry point, mirroring the Go starter pipeline."""
 
+from structlog.typing import FilteringBoundLogger
+
 import sys
 
 from pydantic import ValidationError
@@ -10,14 +12,14 @@ from logger import new_logger
 
 def main() -> None:
     try:
-        cfg = env.load()
+        cfg: env.Env = env.load()
     except ValidationError as error:
         print(f"Failed to load environment variables: {error}", file=sys.stderr)
         sys.exit(1)
 
-    logger = new_logger(cfg.environment)
+    logger: FilteringBoundLogger = new_logger(cfg.environment)
 
-    logger.info("application started", port=cfg.port)
+    logger.info(event="application started", port=cfg.port)
 
 
 if __name__ == "__main__":
