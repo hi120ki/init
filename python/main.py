@@ -21,7 +21,7 @@ class Environment(str, Enum):
 
 
 class Config(BaseSettings):
-    api_key: str = Field(..., validation_alias="API_KEY")
+    api_key: str = Field(default=..., validation_alias="API_KEY")
     environment: Environment = Field(
         default=Environment.DEVELOPMENT, validation_alias="ENVIRONMENT"
     )
@@ -51,20 +51,20 @@ def configure_logging(environment: Environment) -> BoundLogger:
 
 def main():
     load_dotenv()
-    default_environment = Environment.DEVELOPMENT
-    log = configure_logging(default_environment)
+    default_environment: Environment = Environment.DEVELOPMENT
+    log: BoundLogger = configure_logging(default_environment)
 
     try:
         config = Config()
     except ValidationError as error:
-        log.error("Failed to load configuration", error=error.errors())
+        log.error(event="Failed to load configuration", error=error.errors())
         sys.exit(1)
 
     if config.environment != default_environment:
-        log = configure_logging(config.environment)
+        log: BoundLogger = configure_logging(config.environment)
 
     log.info(
-        "Application started",
+        event="Application started",
         api_key=config.api_key,
         environment=config.environment.value,
     )

@@ -9,8 +9,4 @@ hello: ## Print "Hello, World!"
 
 .PHONY: run
 run: ## Run the application
-	go run cmd/server/main.go
-
-.PHONY: test
-test: ## Run tests
-	go test -v ./... -race -cover
+	uv run main.py
