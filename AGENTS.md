@@ -2,22 +2,22 @@
 
 ## Project Structure & Module Organization
 
-This repository hosts language-specific starters. `golang/` provides a single-module service wired with `slog`, `godotenv`, and `envconfig`. `python/` is a uv-managed app whose `main.py` mirrors the Go pipeline with `pydantic-settings`. `ts/` contains a TypeScript entry at `src/index.ts`, compiled into `dist/` by `tsc`. Keep assets inside their language directory and place tests next to the code they exercise (`golang/...`, `python/tests/`, `ts/src/__tests__/`).
+This repository hosts language-specific starters that all mirror the same pipeline: load environment configuration, validate it, then log through a structured JSON logger. `golang/` is the reference implementation, a single-module service split into `cmd/server` (entry point), `internal/env` (configuration), and `internal/logger` (logging). `python/` is a uv-managed app mirroring that layout with `main.py`, `env.py`, and `logger.py`. `ts/` mirrors it with `src/index.ts`, `src/env.ts`, and `src/logger.ts`, compiled into `dist/` by `tsc`. Keep assets inside their language directory and place tests next to the code they exercise (`golang/...`, `python/tests/`, `ts/src/__tests__/`).
 
 ## Build, Test, and Development Commands
 
-- `cd golang && go run .` starts the Go binary with structured logging.
-- `cd python && uv sync && uv run python main.py` installs dependencies, then runs the Python variant.
-- `cd ts && npm install && npm run dev` builds the TypeScript bundle and runs the generated Node service.
-- `make help` lists shared Make targets; update it when adding cross-project workflows.
+- `cd golang && go run ./cmd/server` starts the Go binary with structured logging.
+- `cd python && uv sync && uv run main.py` installs dependencies, then runs the Python variant.
+- `cd ts && npm install && npm run dev` runs the TypeScript service in watch mode; `npm run build && npm start` runs the compiled output. `npm run typecheck` type-checks without emitting.
+- `make help` lists shared Make targets (`run-*` and `test-*` per language, `test` for all); update it when adding cross-project workflows.
 
 ## Coding Style & Naming Conventions
 
-Follow idiomatic patterns: run `go fmt ./...` before committing Go changes and keep package names lowercase. Python code stays type-annotated, PEP 8 compliant, and uses snake_case; log with `structlog`. TypeScript remains in ES module syntax, uses camelCase, and validates configuration with `zod`. Keep shared environment keys such as `API_KEY` and `ENVIRONMENT` identical everywhere.
+Follow idiomatic patterns: run `go fmt ./...` before committing Go changes and keep package names lowercase. Python code stays type-annotated, PEP 8 compliant, and uses snake_case; log with `structlog`. TypeScript remains in ES module syntax, uses camelCase, and validates configuration with `zod`. The Go implementation is the master: when behavior diverges across languages, align Python and TypeScript to Go. Keep shared environment keys such as `ENVIRONMENT` and `PORT` identical everywhere.
 
 ## Testing Guidelines
 
-Add unit tests whenever you modify behavior. Go tests belong in the same package and run with `cd golang && go test ./...`. Python tests live under `python/tests/`; add `pytest` to `pyproject.toml` and execute with `cd python && uv run pytest`. TypeScript tests go under `ts/src/__tests__/`; wire them into `npm test` so the placeholder command stops failing. Missing runnable tests for new features will block review.
+Add unit tests whenever you modify behavior. Go tests belong in the same package and run with `cd golang && go test ./...`. Python tests live under `python/tests/` and run with `cd python && uv run pytest`. TypeScript tests live under `ts/src/__tests__/` and run with `cd ts && npm test`. Missing runnable tests for new features will block review.
 
 ## Commit & Pull Request Guidelines
 
@@ -25,4 +25,4 @@ History currently uses short imperative subjects (“Initial commit”); keep th
 
 ## Environment & Configuration Tips
 
-All starters expect `.env` files or exported variables providing an `API_KEY`; keep secrets in deployment tooling rather than the repo. Log verbosity is controlled by `ENVIRONMENT`—default to non-production verbosity while developing and document any new flags or configuration fields you introduce.
+All starters read an optional `.env` file (see the `.env.example` files) or exported variables. `ENVIRONMENT` (`development` or `production`, default `development`) controls log verbosity—debug in development, info in production. `PORT` (default `8080`) sets the listen port. Keep secrets in deployment tooling rather than the repo, never log them, and document any new flags or configuration fields you introduce.

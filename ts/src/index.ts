@@ -1,64 +1,21 @@
-import pino, { type Logger } from "pino";
-import * as dotenv from "dotenv";
-import { z } from "zod";
+import { type Env, loadEnv } from "./env.js";
+import { createLogger } from "./logger.js";
 
-enum Environment {
-  Development = "development",
-  Production = "production",
-}
-
-const EnvSchema = z.object({
-  API_KEY: z.string().min(1, "API_KEY is required"),
-  ENVIRONMENT: z.enum(Environment).default(Environment.Development),
-});
-
-type Config = {
-  apiKey: string;
-  environment: Environment;
-};
-
-const createLogger = (environment: Environment): Logger => {
-  const level = environment === Environment.Production ? "info" : "debug";
-  return pino({
-    level,
-    base: { name: "app" },
-    timestamp: pino.stdTimeFunctions.isoTime,
-  });
-};
-
-const parseConfig = (logger: Logger): Config => {
-  const parsed = EnvSchema.safeParse(process.env);
-  if (!parsed.success) {
-    const issues = parsed.error.issues.map((issue) => ({
-      path: issue.path.join(".") || "<root>",
-      message: issue.message,
-    }));
-    logger.error(
-      { error: { issues } },
-      "Failed to process environment variables",
+function main(): void {
+  let env: Env;
+  try {
+    env = loadEnv();
+  } catch (error) {
+    console.error(
+      "Failed to load environment variables:",
+      error instanceof Error ? error.message : error,
     );
     process.exit(1);
   }
-  return {
-    apiKey: parsed.data.API_KEY,
-    environment: parsed.data.ENVIRONMENT,
-  };
-};
 
-const main = (): void => {
-  dotenv.config({ quiet: true });
-  const initialEnvironment = Environment.Development;
-  const bootstrapLogger = createLogger(initialEnvironment);
-  const config = parseConfig(bootstrapLogger);
-  const logger =
-    config.environment === initialEnvironment
-      ? bootstrapLogger
-      : createLogger(config.environment);
+  const logger = createLogger(env.environment);
 
-  logger.info(
-    { api_key: config.apiKey, environment: config.environment },
-    "Application started",
-  );
-};
+  logger.info({ port: env.port }, "application started");
+}
 
 main();

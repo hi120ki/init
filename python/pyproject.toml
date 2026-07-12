@@ -1,12 +1,20 @@
 [project]
 name = "init"
 version = "0.1.0"
-description = "Add your description here"
+description = "Python starter with validated environment configuration and structured JSON logging"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
-    "python-dotenv>=1.1.1",
     "structlog>=25.4.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

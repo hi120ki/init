@@ -33,12 +33,7 @@ jobs:
 
       - name: Check code
         run: |
-          uv run python -m py_compile main.py
+          uv run python -m py_compile main.py env.py logger.py
 
       - name: Run tests
-        run: |
-          if uv run python -c "import pytest" 2>/dev/null; then
-            uv run pytest
-          else
-            echo "pytest not configured, skipping tests"
-          fi
+        run: uv run pytest
