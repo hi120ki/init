@@ -1,13 +1,11 @@
 """Application entry point, mirroring the Go starter pipeline."""
 
-from structlog.typing import FilteringBoundLogger
-
 import sys
-
-from pydantic import ValidationError
 
 import env
 from logger import new_logger
+from pydantic import ValidationError
+from structlog.typing import FilteringBoundLogger
 
 
 def main() -> None:

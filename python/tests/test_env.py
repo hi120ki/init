@@ -1,7 +1,6 @@
 import pytest
-from pydantic import ValidationError
-
 from env import Env, Environment
+from pydantic import ValidationError
 
 
 def test_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
