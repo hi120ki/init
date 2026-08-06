@@ -1,7 +1,6 @@
 import json
 
 import pytest
-
 from env import Environment
 from logger import new_logger
 
